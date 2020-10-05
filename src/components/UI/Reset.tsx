@@ -4,6 +4,8 @@ export default createGlobalStyle`
 html {
   box-sizing: border-box;
   font-size: 16px;
+  font: inherit;
+    font-family: Poppins, sans-serif;
 }
 
 *, *:before, *:after {

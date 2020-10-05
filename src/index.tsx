@@ -1,11 +1,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
+import Reset from './components/UI/Reset'
+import Theme from './components/UI/Theme'
 // import * as serviceWorker from './serviceWorker'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Reset />
+    <Theme>
+      <App />
+    </Theme>
   </React.StrictMode>,
   document.getElementById('root')
 )

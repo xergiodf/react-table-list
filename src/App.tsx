@@ -1,8 +1,58 @@
 import React, { useEffect, useState } from 'react'
-import Reset from './components/UI/Reset'
 import { Vehicle } from './typings'
 import getVehicles from './services/vechicles'
-import Table from './components/Table'
+import DataTable from './components/DataTable'
+import Header from './components/UI/Header'
+
+// Column display definition
+const COLUMNS_DEF = [
+  {
+    label: 'ID',
+    key: 'id',
+    render: (value: string) => `${value.split('-')[0]}...`,
+  },
+  {
+    label: 'Model',
+    key: 'model',
+    render: (value: string) => value,
+  },
+  {
+    label: 'Make',
+    key: 'make',
+    render: (value: string) => value,
+  },
+  {
+    label: 'Licence State',
+    key: 'license_plate_state',
+    render: (value: string) => value,
+  },
+  {
+    label: 'Licence Plate',
+    key: 'license_plate_number',
+    render: (value: string) => value,
+  },
+  {
+    label: 'Last mi. reported',
+    key: 'last_mileage_reported',
+    render: (value: string) => value,
+  },
+  {
+    label: 'Mi. until svc',
+    key: 'miles_until_service',
+    render: (value: string) => value,
+    className: (value: string) => (Number(value) < 500 && 'alert') || '',
+  },
+  {
+    label: 'Status',
+    key: 'status',
+    render: (value: string) => value,
+  },
+  {
+    label: 'Available',
+    key: 'available',
+    render: (value: string) => `${(value === 'true' && '🔵️') || '🔴️'}`,
+  },
+]
 
 const App: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[] | undefined>()
@@ -18,12 +68,10 @@ const App: React.FC = () => {
 
   return (
     <>
-      <Reset />
-
-      <header>Kyte code challenge</header>
-      {(vehicles && vehicles.length > 0) ? (
+      <Header>React Table List</Header>
+      {vehicles && vehicles.length > 0 ? (
         <>
-          <Table
+          <DataTable
             sortBy="miles_until_service"
             data={vehicles}
             filters={[
@@ -34,11 +82,12 @@ const App: React.FC = () => {
               'model',
               'vehicle_class',
             ]}
-          >
-            <h1>Hola</h1>
-          </Table>
+            columnsDef={COLUMNS_DEF}
+          />
         </>
-      ) : (<p>Loading data...</p>)}
+      ) : (
+        <p>Loading data...</p>
+      )}
     </>
   )
 }

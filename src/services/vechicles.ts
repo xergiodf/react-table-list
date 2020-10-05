@@ -5,6 +5,9 @@ const proxy = 'https://cors-anywhere.herokuapp.com/'
 const api = 'https://drive-kyte.herokuapp.com/api/v1/'
 
 async function getVehicles(): Promise<Response<Vehicle>> {
+  if (process.env.NODE_ENV === 'development')
+    return fakeData
+
   try {
     return await (await fetch(`${proxy}${api}vehicles`)).json()
   } finally {

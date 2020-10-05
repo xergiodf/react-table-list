@@ -19,3 +19,15 @@ export type KeyValue = {
   key: string
   value: string
 }
+
+export type ColumnDefinition = {
+  label: string
+  key: string
+  render: (value: string) => string
+  className?: (value: string) => string
+}
+
+export type FilterProps = {
+  id: string
+  handleFilter?: (filter: KeyValue) => void
+}
