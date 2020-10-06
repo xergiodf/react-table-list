@@ -6,8 +6,12 @@ const InputWrapper = styled.div`
   display: flex;
 `
 
-const Input: React.FC<FilterProps> = ({ id, handleFilter = () => {} }) => {
-  const [value, setValue] = useState<string>('')
+const Input: React.FC<FilterProps> = ({
+  id,
+  filterValue,
+  handleFilter = () => {},
+}) => {
+  const [value, setValue] = useState<string>(filterValue || '')
 
   const handleChange = (key: string, val: string) => {
     setValue(val)
@@ -20,7 +24,7 @@ const Input: React.FC<FilterProps> = ({ id, handleFilter = () => {} }) => {
   return (
     <InputWrapper>
       <input
-        autoComplete="false"
+        autoComplete="off"
         name={id}
         type="text"
         onChange={(e) => handleChange(e.target.name, e.target.value)}

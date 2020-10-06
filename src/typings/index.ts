@@ -29,5 +29,6 @@ export type ColumnDefinition = {
 
 export type FilterProps = {
   id: string
+  filterValue?: string
   handleFilter?: (filter: KeyValue) => void
 }

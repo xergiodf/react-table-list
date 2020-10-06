@@ -7,12 +7,13 @@ const Filter: React.FC<FilterProps> = ({
   id,
   handleFilter = () => {},
   children,
+  filterValue,
 }) => (
   <Dropdown>
     {children}
     {'  '}🔍️
     <DropdownContent>
-      <Input id={id} handleFilter={handleFilter} />
+      <Input id={id} handleFilter={handleFilter} filterValue={filterValue} />
     </DropdownContent>
   </Dropdown>
 )

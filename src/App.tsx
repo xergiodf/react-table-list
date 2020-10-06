@@ -3,6 +3,7 @@ import { Vehicle } from './typings'
 import getVehicles from './services/vechicles'
 import DataTable from './components/DataTable'
 import Header from './components/UI/Header'
+import useQueryString from './hooks/useQueryString'
 
 // Column display definition
 const COLUMNS_DEF = [
@@ -56,6 +57,9 @@ const COLUMNS_DEF = [
 
 const App: React.FC = () => {
   const [vehicles, setVehicles] = useState<Vehicle[] | undefined>()
+  const [qsSortBy] = useQueryString('sortBy', 'miles_until_service')
+  const [qsSortDir, setQsSortDir] = useQueryString('sortDir', 'ASC')
+  const [qsFilter, setQsFilter] = useQueryString('filter', '')
 
   useEffect(() => {
     async function load(): Promise<void> {
@@ -66,13 +70,23 @@ const App: React.FC = () => {
     load()
   }, [])
 
+  // Sync sort state with url params
+  const onSort: (value: string) => void = (value) => setQsSortDir(value)
+
+  // Sync filter params with url params
+  const onFilter: (filter: string) => void = (filter) => {
+    setQsFilter(filter)
+  }
+
   return (
     <>
       <Header>React Table List</Header>
       {vehicles && vehicles.length > 0 ? (
         <>
           <DataTable
-            sortBy="miles_until_service"
+            sortBy={qsSortBy}
+            sortDir={qsSortDir}
+            onSort={onSort}
             data={vehicles}
             filters={[
               'license_plate_number',
@@ -82,6 +96,8 @@ const App: React.FC = () => {
               'model',
               'vehicle_class',
             ]}
+            onFilter={onFilter}
+            selectedFilters={qsFilter}
             columnsDef={COLUMNS_DEF}
           />
         </>

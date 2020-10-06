@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import qs from 'query-string'
 import styled from 'styled-components'
 import { ColumnDefinition, KeyValue } from '../../typings'
 import Cell from './Cell'
@@ -7,8 +8,12 @@ import { Table, TableHead, TableBody } from './Table'
 type DataTableProps = {
   data?: any[]
   filters?: string[]
+  onFilter?: (filter: string) => void
+  selectedFilters?: string
   columnsDef: ColumnDefinition[]
   sortBy?: string
+  sortDir?: string
+  onSort?: (value: string) => void
 }
 
 const Wrapper = styled.div`
@@ -20,13 +25,24 @@ const DataTable: React.FC<DataTableProps> = ({
   filters = [],
   columnsDef,
   data = [],
+  onSort = (value) => {},
+  sortDir,
+  onFilter = (key) => {},
+  selectedFilters = '',
 }) => {
   const keys = columnsDef.map((c) => c.key)
   const sortKey = sortBy || keys[0]
+  const parsedFilters = qs.parse(selectedFilters)
+  const parsedFilterKeys = Object.keys(parsedFilters)
 
-  const [asc, setAsc] = useState<boolean>(true)
+  const [asc, setAsc] = useState<boolean>(sortDir !== 'DESC')
   const [currentFilters, setCurrentFilters] = useState<KeyValue[]>(
-    filters.map((f) => ({ key: f, value: '' }))
+    filters.map((f) => {
+      if (parsedFilterKeys.includes(f))
+        return { key: f, value: parsedFilters[f] as string }
+
+      return { key: f, value: '' }
+    })
   )
 
   // Desc by default
@@ -47,13 +63,36 @@ const DataTable: React.FC<DataTableProps> = ({
     )
   })
 
+  /**
+   *  On every filter change, triggers an
+   *  update to the filters state and pass
+   *  the stringified params to the callback
+   */
   const handleFilter = (filter: KeyValue) => {
-    setCurrentFilters(
-      currentFilters.map((f) => {
-        if (f.key === filter.key) return filter
-        return f
-      })
+    const newFilters = currentFilters.map((f) => {
+      if (f.key === filter.key) return filter
+      return f
+    })
+    setCurrentFilters(newFilters)
+    onFilter(
+      qs.stringify(
+        newFilters
+          .filter((f) => f.value.length > 0)
+          .reduce(
+            (acc, cur) => Object.assign(acc, { [cur.key]: cur.value }),
+            {}
+          )
+      )
     )
+  }
+
+  /**
+   * On sortDir change state and trigger
+   * the query param update
+   */
+  const handleSort = () => {
+    onSort((!asc && 'ASC') || 'DESC')
+    setAsc(!asc)
   }
 
   return (
@@ -67,10 +106,11 @@ const DataTable: React.FC<DataTableProps> = ({
                 keyId={key}
                 isHeader
                 onClick={() => {
-                  if (key === sortKey) setAsc(!asc)
+                  if (key === sortKey) handleSort()
                 }}
                 filters={filters}
                 handleFilter={handleFilter}
+                currentFilters={currentFilters}
               >
                 {columnsDef.find((c) => c.key === key)?.label}{' '}
                 {key === sortKey && <>{asc ? '🔺️' : '🔻️'}</>}
@@ -83,6 +123,7 @@ const DataTable: React.FC<DataTableProps> = ({
             <tr key={`row-${i}`}>
               {keys.map((key) => {
                 const colDef = columnsDef.find((c) => c.key === key)
+
                 const value = colDef?.render(row[key]?.toString())
                 const extraClass =
                   (colDef?.className &&

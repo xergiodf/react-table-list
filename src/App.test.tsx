@@ -4,6 +4,6 @@ import App from './App'
 
 test('renders learn react link', () => {
   const { getByText } = render(<App />)
-  const linkElement = getByText(/Kyte code challenge/i)
+  const linkElement = getByText(/Loading data.../i)
   expect(linkElement).toBeInTheDocument()
 })
